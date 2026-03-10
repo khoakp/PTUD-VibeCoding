@@ -2,6 +2,7 @@ import { Routes, Route, Link, useLocation } from 'react-router-dom'
 import { Navbar, Nav, Container } from 'react-bootstrap'
 import StudentList from './pages/StudentList.jsx'
 import AddStudent from './pages/AddStudent.jsx'
+import Statistics from './pages/Statistics.jsx'
 
 function App() {
   const location = useLocation()
@@ -30,6 +31,13 @@ function App() {
               >
                 Add Student
               </Nav.Link>
+              <Nav.Link
+                as={Link}
+                to="/statistics"
+                active={location.pathname === '/statistics'}
+              >
+                Statistics
+              </Nav.Link>
             </Nav>
           </Navbar.Collapse>
         </Container>
@@ -39,6 +47,7 @@ function App() {
         <Routes>
           <Route path="/" element={<StudentList />} />
           <Route path="/add" element={<AddStudent />} />
+          <Route path="/statistics" element={<Statistics />} />
         </Routes>
       </Container>
     </>

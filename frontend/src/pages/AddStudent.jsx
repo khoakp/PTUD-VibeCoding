@@ -1,7 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Form, Button, Card, Alert, Spinner, Row, Col } from 'react-bootstrap'
-import { createStudent } from '../api'
+import { createStudent, getClasses } from '../api'
 
 function AddStudent() {
   const navigate = useNavigate()
@@ -12,9 +12,15 @@ function AddStudent() {
     birth_year: '',
     major: '',
     gpa: '',
+    class_id: '',
   })
+  const [classes, setClasses] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+
+  useEffect(() => {
+    getClasses().then((res) => setClasses(res.data)).catch(() => {})
+  }, [])
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value })
@@ -31,6 +37,7 @@ function AddStudent() {
         birth_year: parseInt(form.birth_year),
         major: form.major.trim(),
         gpa: parseFloat(form.gpa),
+        class_id: form.class_id || null,
       }
       await createStudent(payload)
       navigate('/')
@@ -127,6 +134,22 @@ function AddStudent() {
                   onChange={handleChange}
                   required
                 />
+              </Form.Group>
+
+              <Form.Group className="mb-4">
+                <Form.Label>Class</Form.Label>
+                <Form.Select
+                  name="class_id"
+                  value={form.class_id}
+                  onChange={handleChange}
+                >
+                  <option value="">— No Class —</option>
+                  {classes.map((c) => (
+                    <option key={c.class_id} value={c.class_id}>
+                      {c.class_name}
+                    </option>
+                  ))}
+                </Form.Select>
               </Form.Group>
 
               <div className="d-grid">

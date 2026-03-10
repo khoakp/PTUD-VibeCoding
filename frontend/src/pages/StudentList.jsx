@@ -2,10 +2,11 @@ import { useState, useEffect } from 'react'
 import {
   Table, Button, Modal, Form, Alert, Spinner, Badge, InputGroup, FormControl,
 } from 'react-bootstrap'
-import { getStudents, deleteStudent, updateStudent } from '../api'
+import { getStudents, deleteStudent, updateStudent, getClasses, exportStudentsCSV } from '../api'
 
 function StudentList() {
   const [students, setStudents] = useState([])
+  const [classes, setClasses] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [successMsg, setSuccessMsg] = useState('')
@@ -21,6 +22,7 @@ function StudentList() {
     birth_year: '',
     major: '',
     gpa: '',
+    class_id: '',
   })
   const [editLoading, setEditLoading] = useState(false)
 
@@ -41,8 +43,16 @@ function StudentList() {
     }
   }
 
+  const fetchClasses = async () => {
+    try {
+      const res = await getClasses()
+      setClasses(res.data)
+    } catch { /* ignore */ }
+  }
+
   useEffect(() => {
     fetchStudents()
+    fetchClasses()
   }, [])
 
   // Auto-dismiss success message
@@ -52,6 +62,23 @@ function StudentList() {
       return () => clearTimeout(timer)
     }
   }, [successMsg])
+
+  // ── Export CSV ──────────────────────────
+  const handleExportCSV = async () => {
+    try {
+      const res = await exportStudentsCSV()
+      const url = window.URL.createObjectURL(new Blob([res.data]))
+      const link = document.createElement('a')
+      link.href = url
+      link.setAttribute('download', 'students.csv')
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+      window.URL.revokeObjectURL(url)
+    } catch {
+      setError('Failed to export CSV.')
+    }
+  }
 
   // ── Delete ──────────────────────────────
   const handleDeleteClick = (student) => {
@@ -80,6 +107,7 @@ function StudentList() {
       birth_year: student.birth_year,
       major: student.major,
       gpa: student.gpa,
+      class_id: student.class_id || '',
     })
     setShowEdit(true)
   }
@@ -97,6 +125,7 @@ function StudentList() {
         birth_year: parseInt(editForm.birth_year),
         major: editForm.major,
         gpa: parseFloat(editForm.gpa),
+        class_id: editForm.class_id || null,
       }
       await updateStudent(editForm.student_id, payload)
       setShowEdit(false)
@@ -135,13 +164,18 @@ function StudentList() {
         <h2>
           Student List <Badge bg="secondary">{filtered.length}</Badge>
         </h2>
-        <InputGroup style={{ maxWidth: 300 }}>
-          <FormControl
-            placeholder="Search by ID, name, major..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-        </InputGroup>
+        <div className="d-flex gap-2">
+          <Button variant="outline-success" onClick={handleExportCSV}>
+            📥 Export CSV
+          </Button>
+          <InputGroup style={{ maxWidth: 300 }}>
+            <FormControl
+              placeholder="Search by ID, name, major..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </InputGroup>
+        </div>
       </div>
 
       {error && <Alert variant="danger" dismissible onClose={() => setError('')}>{error}</Alert>}
@@ -159,6 +193,7 @@ function StudentList() {
                 <th>Name</th>
                 <th>Birth Year</th>
                 <th>Major</th>
+                <th>Class</th>
                 <th>GPA</th>
                 <th className="text-center">Actions</th>
               </tr>
@@ -171,6 +206,7 @@ function StudentList() {
                   <td>{student.name}</td>
                   <td>{student.birth_year}</td>
                   <td>{student.major}</td>
+                  <td>{student.class_name || '—'}</td>
                   <td>
                     <Badge bg={student.gpa >= 3.5 ? 'success' : student.gpa >= 2.5 ? 'warning' : 'danger'}>
                       {student.gpa.toFixed(2)}
@@ -260,6 +296,21 @@ function StudentList() {
                 max={4}
                 required
               />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Class</Form.Label>
+              <Form.Select
+                name="class_id"
+                value={editForm.class_id}
+                onChange={handleEditChange}
+              >
+                <option value="">— No Class —</option>
+                {classes.map((c) => (
+                  <option key={c.class_id} value={c.class_id}>
+                    {c.class_name}
+                  </option>
+                ))}
+              </Form.Select>
             </Form.Group>
           </Modal.Body>
           <Modal.Footer>

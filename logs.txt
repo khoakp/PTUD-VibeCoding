@@ -1,0 +1,50 @@
+Bước 1. 
+Thực hiện prompt : 
+
+"Xây dựng một web app quản lý sinh viên đơn giản.
+
+với các chức năng như: thêm sinh viên, edit sinh viên, xóa sinh viên, danh sách sinh viên, 
+
+Các trường của sinh viên bao gồm: student_id : mã số sinh viên, name : tên sinh viên, birth_year : năm sinh, major : ngành học, gpa : điểm trung bình.
+
+sử dụng database là sql lite, ngoài ra còn phải sinh thêm một file dữ liệu mẫu đặt tên là sample_data.csv với khoảng 20 thông tin sinh viên có các trường như trên.
+
+sử dụng fastapi + reactjs để tạo giao diện, yêu cầu giao diện phải gọn gàng bao gồm 2 màn hình: 1 màn hình danh sách sinh viên để có thể thao tác các chức năng như sửa hoặc xóa sinh viên ra khỏi hệ thống và 1 màn hình là trang thêm sinh viên hiển thị các thông tin như StudentID, Name, Birth Year, Major, GPA ngoài ra có thêm một nút để thực hiện chức năng thêm sinh viên.
+
+"
+================================================
+Bước 2.
+
+sử dụng prompt để hoàn thiện phần 2:
+prompt : "Modify the existing student management system.
+
+New requirements:
+
+1. Add a Class table:
+class_id
+class_name
+advisor
+
+2. Each student belongs to a class.
+
+3. Add search by student name.
+
+4. Add statistics:
+- total students
+- average GPA
+- number of students by major
+
+5. Add export to CSV feature.
+"
+================================================
+Dự án này dùng stack như sau:
+
+Backend: Python, FastAPI, SQLAlchemy, Pydantic
+Database: SQLite (file students.db)
+API server: Uvicorn
+Frontend: React (Vite), React Router DOM
+Giao diện: Bootstrap + React-Bootstrap
+Gọi API: Axios
+Dữ liệu mẫu/xuất dữ liệu: CSV (sample_data.csv, export CSV)
+
+sử dụng github copilot để vibe code ra dự án này.
